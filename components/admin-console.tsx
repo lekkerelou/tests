@@ -415,7 +415,7 @@ function Login({
               alt="Logo TokAPI"
               className="tokapi-logo"
               height={32}
-              src="/tokapi-logo.png"
+              src="/tokapi-logo-tight.png"
               width={32}
             />
             <Text as="span" bold>
@@ -708,7 +708,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
               alt="Logo TokAPI"
               className="tokapi-logo"
               height={32}
-              src="/tokapi-logo.png"
+              src="/tokapi-logo-tight.png"
               width={32}
             />
             <Text as="span" bold>

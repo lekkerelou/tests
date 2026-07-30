@@ -6,9 +6,9 @@ export const metadata: Metadata = {
   title: "Claude Admin · TokAPI",
   description: "Claude Platform administration by TokAPI.",
   icons: {
-    icon: [{ url: "/tokapi-logo.png", type: "image/png" }],
-    shortcut: "/tokapi-logo.png",
-    apple: "/tokapi-logo.png",
+    icon: [{ url: "/tokapi-logo-tight.png", type: "image/png" }],
+    shortcut: "/tokapi-logo-tight.png",
+    apple: "/tokapi-logo-tight.png",
   },
 };
 
