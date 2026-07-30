@@ -1,0 +1,13 @@
+.git
+.github
+.idea
+.next
+.vinext
+.wrangler
+dist
+node_modules
+*.log
+*.tsbuildinfo
+.env*
+README.md
+compose.yaml
