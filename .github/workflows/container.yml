@@ -62,8 +62,8 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=northstar-admin
-          cache-to: type=gha,mode=max,scope=northstar-admin
+          cache-from: type=gha,scope=claude-control
+          cache-to: type=gha,mode=max,scope=claude-control
           provenance: mode=max
           sbom: true
 

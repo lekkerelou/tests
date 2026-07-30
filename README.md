@@ -1,19 +1,54 @@
-# Northstar Admin
+# Claude Control
 
-Panel d’administration construit avec [vinext](https://github.com/cloudflare/vinext),
-[Kumo UI](https://kumo-ui.com/) et Tailwind CSS 4. Le build vinext produit un
-serveur Node.js autonome dans `dist/standalone`.
+Dark administration console built with
+[vinext](https://github.com/cloudflare/vinext) and
+[Kumo UI](https://kumo-ui.com/). The interface exclusively uses Kumo
+components for controls, forms, tables, dialogs, and states.
 
-## Développement
+The console covers features available through an Anthropic Admin key:
+
+- organization information;
+- members, roles, and access removal;
+- invitations;
+- workspaces and archiving;
+- API key inventory and deactivation;
+- usage, costs, and Claude Code analytics;
+- rate limits and spend limits;
+- Compliance Activity Feed;
+- advanced explorer restricted to an Admin API allowlist.
+
+Features requiring an `org:admin` OAuth token, including service accounts and
+Workload Identity Federation, are not exposed through Admin key authentication.
+
+## Session security
+
+The `sk-ant-admin…` key is validated with `GET /v1/organizations/me`, encrypted
+with AES-GCM, and stored for eight hours in an `HttpOnly`, `SameSite=Strict`
+cookie that is `Secure` in production. It is never returned to client-side code
+or stored in `localStorage`.
+
+Set an encryption secret that is independent from the Anthropic key:
+
+```bash
+cp .env.example .env.local
+```
+
+`ADMIN_SESSION_SECRET` must contain at least 32 characters. Generate one with:
+
+```bash
+openssl rand -hex 32
+```
+
+## Development
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-Ouvrez ensuite <http://localhost:3000>.
+Then open <http://localhost:3000>.
 
-## Vérifier et construire
+## Check and build
 
 ```bash
 pnpm check
@@ -21,20 +56,21 @@ pnpm build
 pnpm start
 ```
 
-Le endpoint `GET /api/health` est utilisé par le healthcheck du conteneur.
+The container health check uses the `GET /api/health` endpoint.
 
 ## Docker
 
-L’image finale utilise Node.js 24 distroless et s’exécute avec l’utilisateur
-non privilégié `65532`. Elle ne contient ni shell, ni gestionnaire de paquets,
-ni sources du projet.
+The final image uses Node.js 24 distroless and runs as the unprivileged user
+`65532`. It contains no shell, package manager, or project source files.
 
 ```bash
+export ADMIN_SESSION_SECRET="$(openssl rand -hex 32)"
 docker build --tag northstar-admin .
 docker run --rm --read-only \
   --user 65532:65532 \
   --cap-drop ALL \
   --security-opt no-new-privileges \
+  --env ADMIN_SESSION_SECRET \
   --tmpfs /tmp:rw,noexec,nosuid,size=16m \
   --pids-limit 128 \
   --memory 512m \
@@ -43,34 +79,36 @@ docker run --rm --read-only \
   northstar-admin
 ```
 
-Le profil restrictif est également fourni avec Compose :
+The same restrictive profile is available through Compose:
 
 ```bash
+export ADMIN_SESSION_SECRET="$(openssl rand -hex 32)"
 docker compose up --build
 ```
 
-Pour lancer directement l’image publiée :
+To run the published image directly:
 
 ```bash
 IMAGE=ghcr.io/lekkerelou/tests:latest docker compose up
 ```
 
-## CI/CD et GHCR
+## CI/CD and GHCR
 
-La workflow [`.github/workflows/container.yml`](.github/workflows/container.yml) :
+The [`.github/workflows/container.yml`](.github/workflows/container.yml)
+workflow:
 
-- construit et vérifie l’image sur chaque pull request ;
-- publie les architectures `linux/amd64` et `linux/arm64` sur les pushes vers
-  `main`, les tags `v*` et les lancements manuels ;
-- génère les tags `latest`, branche, Git SHA et version Git ;
-- publie un SBOM et des attestations de provenance ;
-- utilise uniquement le `GITHUB_TOKEN` fourni par GitHub.
+- builds and validates the image on every pull request;
+- publishes `linux/amd64` and `linux/arm64` images on pushes to `main`, `v*`
+  tags, and manual runs;
+- generates `latest`, branch, Git SHA, and Git version tags;
+- publishes an SBOM and provenance attestations;
+- only uses the `GITHUB_TOKEN` supplied by GitHub.
 
-Image publiée :
+Published image:
 
 ```text
 ghcr.io/lekkerelou/tests
 ```
 
-Pour rendre une première image publique, ajustez sa visibilité dans les
-paramètres du package GitHub après sa publication.
+After the first publication, adjust the package visibility in GitHub Packages
+if the image should be public.
