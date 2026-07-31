@@ -2,10 +2,8 @@
 
 FROM node:26.5.0-bookworm-slim@sha256:2d49d876e96237d76de412761cf05dbfe5aee325cc4406a4d41d5824c5bb8beb AS build
 
-ENV PNPM_HOME=/pnpm
-ENV PATH="${PNPM_HOME}:${PATH}"
-
-RUN corepack enable && corepack prepare pnpm@10.30.3 --activate
+RUN npm install --global --ignore-scripts --no-audit --no-fund pnpm@10.30.3 \
+    && npm cache clean --force
 
 WORKDIR /workspace
 
